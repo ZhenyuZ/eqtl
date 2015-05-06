@@ -1,5 +1,5 @@
 # Ask for TCGA username and password, and return secure site url
-GetTCGACredential <- function() {
+GetSecureEntry <- function() {
   # load package
   require(RCurl)
 
