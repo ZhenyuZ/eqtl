@@ -1,16 +1,17 @@
-# Read TCGA Table from url or file, return data frame  	
-GetTCGATable <- function(url) {
+# Read TCGA Table from url or file, return data frame
+# Need TCGA username and password to access protected dataset  	
+GetTCGATable <- function(url, username="", password="") {
   # load package
   require(RCurl)
   
   # read table file
   if(grepl("^http", url)) {
-    s <- try(getURL(url), silent = TRUE);
+    s <- try(getURL(url, username=username, password=password), silent = TRUE);
     if (class(s) == "try-error") 
       return(NULL);    
-    tbl <- read.delim(textConnection(s), quote="\"", check.names=F, as.is=T)	
+    tbl <- read.delim(textConnection(s), quote="\"", as.is=T)	
   } else {
-    tbl = read.delim(url, quote="\"", check.names=F, as.is=T)
+    tbl = read.delim(url, quote="\"", as.is=T)
   }
   
   # remove the first one or two lines starting with "CDE_ID" or "bcr_"

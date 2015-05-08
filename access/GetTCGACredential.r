@@ -20,12 +20,13 @@ GetTCGACredential <- function() {
   
   # Feedback and return
   if(valid) {
-    print("Your TCGA username and password are validated!")
-    cred <- cbind.data.frame(username, password, stringsAsFactors=F)
+    cat("Valid username and password\n")
   } else {
-    print("Invalid username/password combination!")
-    cred <- NULL
+    cat("Username/password invalid: you may not access TCGA protected data\n")
+    username <- ""
+    password <- ""
   }   
-  return(secureEntry)
+  cred <- cbind.data.frame(username, password, stringsAsFactors=F)
+  return(cred)
 }
 
