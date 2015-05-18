@@ -3,7 +3,7 @@
 
 # load packages
 options(stringsAsFactors=F)
-source("/Users/zhenyu/github/eqtl/module.r")
+source("/Users/zhenyu/github/eqtl/module.access.r")
 
 # provide sdrf that contain file and aliquot information
 sdrf.link <- "https://tcga-data-secure.nci.nih.gov/tcgafiles/tcga4yeo/tumor/luad/cgcc/broad.mit.edu/genome_wide_snp_6/snp/broad.mit.edu_LUAD.Genome_Wide_SNP_6.mage-tab.1.2012.0/broad.mit.edu_LUAD.Genome_Wide_SNP_6.sdrf.txt"
