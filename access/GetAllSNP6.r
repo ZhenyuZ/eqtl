@@ -18,6 +18,7 @@ source("~/github/eqtl/module.access.r")
 source("~/github/eqtl/module.annotation.r")
 
 # init: provide disease name and sdrf that contain file and aliquot information
+setwd("~/eqtl/snp/")
 sdrf.list <- read.delim("sdrf.list", h=F, stringsAsFactors=F)
 
 # get username and password for TCGA protected data
