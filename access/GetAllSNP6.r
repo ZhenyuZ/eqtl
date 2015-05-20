@@ -57,7 +57,7 @@ for (i in 1: nrow(sdrf.list)) {
   # filter by annotation table 
   aliquots <- colnames(geno)
   aliquots <- FilterByAnnotation(aliquots, annot.tbl)
-  geno[, which(colnames(geno) %in% aliquots)]
+  geno <- geno[, which(colnames(geno) %in% aliquots)]
 
   # save the processed dbSNP matrix
   save(geno, file=paste0(disease, ".geno.rda"))
