@@ -1,0 +1,28 @@
+## 2010-12-01 ##
+
+Yun Li
+yunli@med.unc.edu
+
+This package contains the prob2plink program, which converts MaCH output (prob+info) into plink dosage file.
+
+How to install:
+	tar -zxvf prob2plink.V*.tgz
+	dos2unix prob2plink_V*/*.pl
+	chmod 755 prob2plink_V*/*.pl
+
+Input:
+	(1) MaCH output prob file (.mlprob or .prob)
+	(2) MaCH output info file (.mlinfo or .info) [only the first three fields are mandatory]
+
+Ouput:
+	(1) .plink_dat (plink dosage file)
+	(2) .fam (plink fam file)
+
+NOTES:
+	* prob file can be compressed (.gz and .bz2 both accepted).
+	* may not work for huge files as this stores all the prob file probabilities into RAM first before writing to output plink_dat file.
+	
+Sample command line:
+
+	./prob2plink.pl -prob example.mlprob.gz -info example.mlinfo -o example.output
+
