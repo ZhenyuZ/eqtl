@@ -16,8 +16,12 @@
 
 options(stringsAsFactors=F)
 
+
 # read disease list
 diseases = unlist(read.table("diseases.txt", h=F))
+s = data.frame(matrix(0, length(diseases), 6))
+colnames(s) = c("disease", "num.SNP", "num.Expr", "num.Met", "num.CNA", "num.somatic.common")
+
 
 for (i in 1: length(diseases)) {
   disease = diseases[i]
@@ -55,7 +59,7 @@ for (i in 1: length(diseases)) {
   tumor.portions = common.tumor.portions[match(common.patients, tumor.patients)]
   
   # Aggregate patients and aliquots
-  output = data.frame(matrix("", length(common.patients), 5))
+  output = data.frame(matrix("", length(common.patients), 10))
   colnames(output) = c("Patient", "SNP", "Expr", "Met", "CNA")
   output$patients = common.patients
   output$SNP = geno.aliquots[match(common.patients, normal.patients)]
@@ -63,9 +67,19 @@ for (i in 1: length(diseases)) {
   output$Met = met.aliquots[match(tumor.portions, met.portions)] 
   output$CNA = cnv.aliquots[match(tumor.portions, cnv.portions)] 
   
+  s$disease[i] = disease
+  s$num.SNP[i] = length(geno.aliquots)
+  s$num.Expr[i] = length(expr.aliquots)
+  s$num.Met[i] = length(met.aliquots)
+  s$num.CNA[i] = length(cnv.aliquots)
+  s$num.somatic.common[i] = length(tumor.patients)
+  
   # output 
   out.file = paste0("./aliquot/", disease, ".matched.aliquots")
   write.table(output, out.file, col.names=T, row.names=F, sep="\t", quote=F)
 }
   
+# output summary
+out.file = paste0("./aliquot/number.summary.txt")
+write.table(s, out.file, col.names=T, row.names=F, sep="\t", quote=F)
   
