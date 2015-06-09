@@ -38,7 +38,7 @@ for(disease in diseases) {
   # Add fid, iid, pid, mid, sex and phenotype
   fid = colnames(geno)
   iid = substr(fid, 1, 12)
-  pid = rep(disease, length(fid))
+  pid = rep("0", length(fid))
   mid = rep("0", length(fid))
   m = match(iid, clin$patient)
   sex = clin$gender[m]
