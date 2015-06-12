@@ -10,12 +10,13 @@ suffix = unlist(read.table("suffix.txt", h=F, stringsAsFactors=F))
 load("summary.rda")
 snps = rownames(summary)
 
-# init output
-output = matrix(NA, length(snps), 2*length(suffix))
-rownames(output) = snps
-
 for(i in 1:length(suffix)) {
   s = suffix[i]
+  
+  # init output
+  output = data.frame(matrix(NA, length(snps), 3))
+  rownames(output) = snps
+  colnames(output) = c("MAF", "beta", "p")
 
   # read edata
   edata = read.delim(paste0("matrix_edata", s), h=T, row.names=1, stringsAsFactors=F)
@@ -31,24 +32,16 @@ for(i in 1:length(suffix)) {
   # change to minor alleles
   row.of.major.allele = which(apply(mdata, 1, mean, na.rm=T) > 1.2)
   mdata[row.of.major.allele, ] = 2 -   mdata[row.of.major.allele, ]
-  output[, 2*i-1] = apply(mdata, 1, mean, na.rm=T)/2
- 
-  
+  output$MAF = apply(mdata, 1, mean, na.rm=T)/2
+   
   # linear regression edata ~ mdata
   mdata = mdata[which(!is.na(m)), ]
-  beta =  apply(mdata, 1, function(x) lm(edata ~ unlist(x))$coefficients[2])
+  output$beta[which(!is.na(m))] =  apply(mdata, 1, function(x) summary(lm(edata ~ unlist(x)))$coefficients[2,1])
+  output$p[which(!is.na(m))] = apply(mdata, 1, function(x) summary(lm(edata ~ unlist(x)))$coefficients[2,4])
 
   # write to output
-  output[which(!is.na(m)), 2*i] = beta
+  outFile = paste0("churc1.summary", s)
+  write.table(output, outFile, col.names=T, row.names=T, sep="\t", quote=F)  
 }
-
-# Add colnames
-for (i in 1: length(suffix)) {
-  colnames(output)[2*i-1] = "maf"
-  colnames(output)[2*i] = suffix[i]
-}
-
-write.table(output, "seeQTL.direction.txt", col.names=T, row.names=T, sep="\t", quote=F)
-
 
 
