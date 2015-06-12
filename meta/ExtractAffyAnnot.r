@@ -7,7 +7,7 @@ out.file = "./meta/na35.CEU.txt"
 
 # read affy annotation file
 annot.file = "./meta/GenomeWideSNP_6.na35.annot.csv"
-annot = read.csv(affy.annot.file, h=T, comment.char="#",colClasses="character")
+annot = read.csv(annot.file, h=T, comment.char="#",colClasses="character")
 
 # Extract ID information
 output = data.frame(annot$dbSNP.RS.ID)
@@ -18,6 +18,7 @@ output$probeset = annot$Probe.Set.ID
 output$chr = annot$Chromosome
 output$pos = annot$Physical.Position
 output$strand = annot$Strand
+output$distance = sapply(annot$Genetic.Map, function(x) strsplit(x, " //")[[1]][1])
 
 # Extract B Allele information
 output$Allele.A = annot$Allele.A
