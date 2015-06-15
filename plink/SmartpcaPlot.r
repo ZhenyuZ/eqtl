@@ -36,4 +36,21 @@ for (i in 1: nrow(color.table)) {
 }
 evec$color = color
 
-with(evec, plot(PC1, PC2, col=color, pch=19))
+png("tcga.hapmap.smartpca.PC1-2.png", width=960, height=720)
+with(evec, plot(PC1, PC2, col=color, pch=19, main="Genotype PCA of combined TCGA and Hapmap data", cex=1.5, cex.lab=1.5, cex.axis=1.5, cex.main=1.5))
+legend("bottomleft", color.table$population, col = color.table$color, pch = 19, cex=1.5)
+dev.off()
+
+png("tcga.hapmap.smartpca.PC3-4.png", width=960, height=720)
+with(evec, plot(PC3, PC4, col=color, pch=19, main="Genotype PCA of combined TCGA and Hapmap data", cex=1.5, cex.lab=1.5, cex.axis=1.5, cex.main=1.5))
+legend("bottomleft", color.table$population, col = color.table$color, pch = 19, cex=1.5)
+dev.off()
+
+# Based on the plots above, determine which TCGA patients are European 
+# European descendant PC2 > 0.012 - 2 * PC1 ; PC4 > -0.04 - 9 * PC3
+evec$euro = with(evec, (PC2 > 0.012 - 2 * PC1) & (PC4 > -0.04 - 9 * PC3))
+select = with(evec, euro & population=="TCGA")
+tcga.evec = evec[select,]
+write.table(tcga.evec, "../tcga.evec.txt", col.names=T, row.names=T, quote=F, sep="\t")
+write.table(evec, "../tcga.hapmap3.txt", col.names=T, row.names=T, quote=F, sep="\t")
+
