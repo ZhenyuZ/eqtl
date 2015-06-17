@@ -69,7 +69,7 @@ for (i in 1:22) {
   output = rbind(output, output.block)
 }  
         
-write.table(output, "churk.range", col.names=F, row.names=F, sep="\t", quote=F)
+write.table(output, "chunk.range", col.names=F, row.names=F, sep="\t", quote=F)
   
   
   
