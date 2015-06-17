@@ -1,4 +1,6 @@
 #!/bin/bash
+## script to run IMPUTE2 by chromosome chunks
+## need to replace ##NAME##, ##CHR##, ##START##, ##END##
 
 refbucket=s3://bioinformatics_scratch/zhenyu/shapeit/ref
 reflegend=1000GP_Phase3_chr##CHR##.legend.gz
