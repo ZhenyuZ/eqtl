@@ -33,6 +33,7 @@ impute2 \
    -int ##START## ##END## \
    -o $outfile \
    -filt_rules_l 'EUR<0.01' \
+   -allow_large_regions \
    -seed 367946
 
 s3cmd put chunk.##NAME##.* $outbucket/chunk.##NAME##/
