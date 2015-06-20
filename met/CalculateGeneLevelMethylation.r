@@ -1,7 +1,8 @@
 # CalculateGeneLevelMethylation.r takes matrix methylation matrix, methylation 
 # table calculated by MapMet2Gene.r, and output gene level methylation of all 
 # disease types
-
+# Note: there is a bug with data.table which results in memory overflow 
+# temporary fix is to replace fread with read.delim(met.file, h=T, colClasses="numeric")
 
 # Function to impute NA in a numeric matrix.  If a whole row is NA, fill with 
 # mean value of the matrix; if a row is partial NA, fill with row mean  
@@ -74,6 +75,7 @@ for (disease in diseases) {
   met = ImputeMatrix(met)
 
   # calculate gene level methylation
+  print("  calculating gene level methylation")
   out = matrix(0, 20531, n)
   colnames(out) = patient
   for (i in 1: nrow(met.table)) {
