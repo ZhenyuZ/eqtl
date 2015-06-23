@@ -21,27 +21,30 @@ for (disease in diseases) {
   met.mean.file = paste0("./met2/", disease, ".meth.by_mean.data.txt")
   met = fread(met.mean.file, h=T)
   
-  # read met aliquot
-  met.aliquot.file = paste0("./met/", disease, ".met.aliquots")
-  met.aliquot = unlist(read.table(met.aliquot.file, h=F))
+  # read common patient
+  common.patient.file = paste0("./plink/geno/", disease, ".patient")
+  common.patient = unlist(read.table(common.patient.file, h=F))
   
   # filter by aliquot
-  met.sample = substr(met.aliquot, 1, 15)
-  m = match(met.sample, colnames(met))
+  met.patient = substr(colnames(met), 1, 12)
+  setnames(met, colnames(met), met.patient)
+  m = match(common.patient, met.patient)
   if(sum(is.na(m)) > 0) print("WARNING! missing data")
   met.gene = met[, 1, with=F]
   met = met[, m, with=F]
   
   # re-arrange gene order
   m = match(gene, unlist(met.gene))
-  output = met[m, ]
-  colnames(output) = substr(met.aliquot, 1, 12)
+  output = as.matrix(met[m, ])
   rownames(output) = id
-  
+  mode(output) = "numeric"
+    
   # output 
   outFile = paste0("./met2/", disease, ".met.by.gene.txt")
   write.table(output, outFile, col.names=T, row.names=T, sep="\t", quote=F)
-  
+  outFile2 = paste0("./met2/", disease, ".met.by.gene.rda")
+  met = output
+  save(met, file=outFile2)
 }
 
   
