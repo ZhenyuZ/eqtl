@@ -1,0 +1,94 @@
+# GetExprMetCNVResidual.r take take regression residuals of expr ~ cnv + met
+# where cnv is transformed to segment mean, expr is log2(1+expr)
+
+options(stringsAsFactors=F)
+
+# read geneloc metadata (not contain genes with separated locations in GAF2)
+geneloc = read.table("./meta/genelocs.txt", h=T, sep="\t")
+
+diseases = unlist(read.table("./diseases.txt"))
+
+for (disease in diseases) {
+  print(paste("Working on disease", disease))
+  
+  # change directory
+  dir = paste0("/home/ubuntu/SCRATCH/eqtl/expr/", disease)
+  setwd(dir)
+  
+  # load expr, met, cnv, expr.aliquot and patient data
+  load("expr.met.cnv.raw.rda")
+  nID = ncol(expr)
+  
+  # filter and impute methylation data
+  met.missing.rate = apply(met, 1, function(x) sum(is.na(x))) / ncol(met)
+  # not use methylation if call rate < 0.95 and met variation per gene is 0
+  met.var.by.gene = apply(met, 1, function(x) var(x, na.rm=T))
+  met.use = (met.missing.rate < 0.05) & (met.var.by.gene != 0)
+  # row index of met data to use
+  met.mean.by.gene = apply(met, 1, function(x) mean(x, na.rm=T) )
+  # detect missing methylation data
+  w = which(is.na(met), arr.ind=T)
+  w = w[which(w[, "row"] %in% which(met.use)), ]
+  # impute missing NA with gene level mean
+  if (nrow(w) > 0) {
+    for (i in 1: nrow(w)) {
+      row = w[i, "row"]
+      col = w[i, "col"]
+      met[row, col] = met.mean.by.gene[row]
+    }
+  }
+  
+  # filter expr by variation per gene is 0 and mean RSEM < 1 and genes that are not in the geneloc file
+  expr.var.by.gene = apply(expr, 1, function(x) var(x, na.rm=T))
+  expr.mean.by.gene = apply(expr, 1, function(x) mean(x, na.rm=T))
+  expr.use = (expr.var.by.gene != 0) & (expr.mean.by.gene >= 1) &   (rownames(expr) %in% geneloc$geneid)
+
+  # filter cnv by variation per gene is 0
+  cnv.var.by.gene = apply(cnv, 1, function(x) var(x, na.rm=T))
+  cnv.use = (cnv.var.by.gene != 0)
+
+  # log2 transform expr, cnv and met, and save
+  expr = log2(expr+1)
+  cnv = log2(cnv/2)
+  cnv[which(!cnv.use), ] = rep(0, ncol(cnv))
+  met[which(!met.use), ] = rep(0, ncol(met))
+  save(expr, cnv, met, expr.use, file = "expr.met.cnv.processed.rda")
+  
+  # init output
+  res.expr = expr
+  no.expr.by.gene = rep(0, 20531)
+  names(no.expr.by.gene) = rownames(expr)
+  
+  for (i in 1:20531){
+    if(i %% 100 == 0) {
+      print(paste("  Taking", i, "out of 20531 genes residuals"))
+    }    	
+    my.expr = expr[i,]
+    my.met = met[i,]
+    my.cnv = cnv[i,]
+    
+    # find expression data that is 0
+    no.expr = (my.expr == 0 ) 
+	no.expr.by.gene[i] = sum(no.expr)
+	
+	# regression and take residuals
+	if(no.expr.by.gene[i] < nID) {
+	  res = lm(my.expr[!no.expr] ~ my.met[!no.expr] + my.cnv[!no.expr])$residual	
+	  # randomize zero expression, and inverse normality transformation   
+   	  min = min(res)
+	  res.expr[i,!no.expr] = res
+	  res.expr[i,no.expr] = runif(no.expr.by.gene[i],min-1,min)
+	  res.expr[i,] = qnorm((rank(res.expr[i,])-1/3) /(nID+1/3))
+	  } else {
+	    res.expr[i, ] = rep(0, nID)
+	  }
+    }
+  # save residuals
+  save(res.expr, expr.use, no.expr.by.gene, file = "expr.residuals.not.filtered.rda")
+  
+  # filter by expr.use
+  expr = res.expr[which(expr.use), ]
+  save(expr, file = "expr.residuals.rda")
+}
+
+
