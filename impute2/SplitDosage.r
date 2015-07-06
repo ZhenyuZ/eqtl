@@ -33,8 +33,6 @@ for (i in 1:22) {
 
   # read disease bim and fam, and split dosage by disease type
   for (disease in diseases) {
-    disease = "UCEC"
-    
     # read disease bim and fam
     bim = fread(paste0("~/SCRATCH/plink2/", disease, ".bim"), h=F)
     setnames(bim, c("chr", "snp", "dist", "pos", "ref", "alt"))
