@@ -22,7 +22,7 @@ snps_location_file_name = "~/SCRATCH/eqtl/meta/snpsloc.txt";
 gene_location_file_name = "~/SCRATCH/eqtl/meta/geneloc.txt";
 covariates_file_name = paste0("~/SCRATCH/eqtl/expr/", disease, "/evec.txt");
 
-expr.files = list.files(pattern="\\w+.+GE.PEER-\\d+.txt")
+expr.files = list.files(pattern="\\w+.+GE.PEER-\\d+.txt$")
 expr.files = expr.files[which(grepl(disease, expr.files))]
 
 useModel = modelLINEAR; # modelANOVA, modelLINEAR, or modelLINEAR_CROSS
