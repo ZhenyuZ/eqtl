@@ -1,0 +1,11 @@
+# PlotEGeneByPerm.r take file "perm100.egene" and output png
+library(ggplot2)
+library(reshape2)
+perm = read.table("perm100.egene", h=F, stringsAsFactors=F)
+colnames(perm) = c("file", "FDR_0.01", "FDR_0.05", "FDR_0.1", "FDR_0.2")
+dfm = melt(perm)
+colnames(dfm) = c("file", "FDR_threshold", "num_eGenes")
+num_PEER = as.numeric(sapply(dfm$file, function(x) strsplit(x, "[\\.|-]")[[1]][2]))
+png("egene.by.perm.png", width=960, height=640)
+ggplot(dfm, aes(x = num_PEER, y = num_eGenes, color = FDR_threshold, group = FDR_threshold)) + geom_point() + geom_line()
+dev.off()
